@@ -1,0 +1,99 @@
+zabbix_export:
+  version: '6.0'
+  date: '2024-07-17T15:05:45Z'
+  groups:
+    - uuid: 8f4c152f5b3c406796d5d3abc6b74549
+      name: 'Templates Iohann'
+  templates:
+    - uuid: 34f15ec750124ca5bc41e40abd7b42aa
+      template: 'Panasonic KX-NS500 E1 Board'
+      name: 'Panasonic KX-NS500 E1 Board'
+      description: |
+        Made by Iohann Tachy (https://github.com/iohann95)
+        Tested on Zabbix version 6.0 LTS.
+        
+        This template uses a Python script with Selenium to log into the Web Maintenance Console and get the status of an E1 board.
+        
+        This approach was taken because this information isn't available on SNMP.
+        
+        (You may need to change the trigger parameters depending on the language defined on the Web Maintenance Console.)
+      groups:
+        - name: 'Templates Iohann'
+      items:
+        - uuid: b27925c86708463a909cedb4dac8ed36
+          name: AIS
+          type: DEPENDENT
+          key: kxns500e1card.ais
+          delay: '0'
+          trends: '0'
+          value_type: TEXT
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.AIS
+          master_item:
+            key: kxns500e1card.py
+        - uuid: 73501b0eb6f64db09273b4eb1a8c7c8b
+          name: Card
+          type: DEPENDENT
+          key: kxns500e1card.card
+          delay: '0'
+          trends: '0'
+          value_type: TEXT
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.Card
+          master_item:
+            key: kxns500e1card.py
+        - uuid: f74e8a5ee8784780ae2ec9d83aa31f2a
+          name: Data
+          type: EXTERNAL
+          key: kxns500e1card.py
+          delay: 30m
+          trends: '0'
+          value_type: TEXT
+        - uuid: ae66ba54b916498397e6854d00a2a79e
+          name: RAI
+          type: DEPENDENT
+          key: kxns500e1card.rai
+          delay: '0'
+          trends: '0'
+          value_type: TEXT
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.RAI
+          master_item:
+            key: kxns500e1card.py
+        - uuid: 66919dd29e264e4cacf306307c1a0592
+          name: SYNC
+          type: DEPENDENT
+          key: kxns500e1card.sync
+          delay: '0'
+          trends: '0'
+          value_type: TEXT
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.SYNC
+          master_item:
+            key: kxns500e1card.py
+          triggers:
+            - uuid: 9a3ef24b82fa4e15b1515eb11084edff
+              expression: 'last(/Panasonic KX-NS500 E1 Board/kxns500e1card.sync)<>"Synchronized"'
+              name: 'SYNC Error'
+              priority: AVERAGE
+        - uuid: 0f5f77abbcc94f6f92b1635da3e05c1f
+          name: SYNC-ERR
+          type: DEPENDENT
+          key: kxns500e1card.syncerr
+          delay: '0'
+          trends: '0'
+          value_type: TEXT
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$[''SYNC-ERR'']'
+          master_item:
+            key: kxns500e1card.py
